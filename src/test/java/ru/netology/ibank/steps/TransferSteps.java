@@ -23,10 +23,7 @@ public class TransferSteps {
     public void login(String login, String password) {
         open(SUT_URL);
         LoginPage loginPage = new LoginPage();
-        VerificationPage verificationPage = loginPage.validLogin(
-                login,
-                password
-        );
+        VerificationPage verificationPage = loginPage.validLogin(login, password);
         dashboardPage = verificationPage.validVerify(DataHelper.getValidVerificationCode());
         webdriver().shouldHave(url(SUT_URL + "/dashboard"));
     }
