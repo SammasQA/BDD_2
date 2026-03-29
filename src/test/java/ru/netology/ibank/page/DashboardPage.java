@@ -9,22 +9,18 @@ import static com.codeborne.selenide.Selenide.$$;
 
 public class DashboardPage {
 
-    private ElementsCollection cards = $$(".list__item");
+    private final ElementsCollection cards = $$(".list__item");
 
     public DashboardPage() {
-
         cards.shouldHave(CollectionCondition.sizeGreaterThan(0));
     }
+
 
     public int getCardBalance(int index) {
         String text = cards.get(index).text();
         return extractBalance(text);
     }
 
-    public int getCardBalance(String cardNumber) {
-        int index = getCardIndexByNumber(cardNumber);
-        return getCardBalance(index);
-    }
 
     public TransferPage clickTransferButton(int index) {
         SelenideElement cardElement = cards.get(index);
@@ -32,23 +28,14 @@ public class DashboardPage {
         return new TransferPage();
     }
 
-    public TransferPage clickTransferButton(String cardNumber) {
-        int index = getCardIndexByNumber(cardNumber);
-        return clickTransferButton(index);
+
+    public int getCardsCount() {
+        return cards.size();
     }
 
-    private int getCardIndexByNumber(String cardNumber) {
 
-        String cleaned = cardNumber.replaceAll("\\s+", "");
-        String lastFour = cleaned.length() > 4 ? cleaned.substring(cleaned.length() - 4) : cleaned;
-
-        for (int i = 0; i < cards.size(); i++) {
-            String text = cards.get(i).text();
-            if (text.contains(lastFour)) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException("Карта с номером, оканчивающимся на " + lastFour + ", не найдена");
+    public String getCardText(int index) {
+        return cards.get(index).text();
     }
 
     private int extractBalance(String text) {
