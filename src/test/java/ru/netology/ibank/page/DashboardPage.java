@@ -1,46 +1,48 @@
 package ru.netology.ibank.page;
 
-import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class DashboardPage {
 
-    private final ElementsCollection cards = $$(".list__item");
+    private ElementsCollection cards = $$(".list__item");
+    private final String balanceStart = "баланс: ";
+    private final String balanceFinish = " р.";
 
+    // Конструктор
     public DashboardPage() {
-        cards.shouldHave(CollectionCondition.sizeGreaterThan(0));
+        cards.first().shouldBe(visible);
     }
 
+    private SelenideElement getCardByMaskedNumber(String maskedNumber) {
+        return cards.findBy(text(maskedNumber));
+    }
 
-    public int getCardBalance(int index) {
-        String text = cards.get(index).text();
+    public int getCardBalance(String maskedNumber) {
+        SelenideElement card = getCardByMaskedNumber(maskedNumber);
+        String text = card.getText();
         return extractBalance(text);
     }
 
-
-    public TransferPage clickTransferButton(int index) {
-        SelenideElement cardElement = cards.get(index);
-        cardElement.$("[data-test-id='action-deposit']").click();
+    public TransferPage clickTransferButton(String receiverMaskedNumber) {
+        SelenideElement card = getCardByMaskedNumber(receiverMaskedNumber);
+        card.$("[data-test-id='action-deposit']").click();
         return new TransferPage();
     }
 
-
-    public int getCardsCount() {
-        return cards.size();
-    }
-
-
-    public String getCardText(int index) {
-        return cards.get(index).text();
+    public void verifyCardBalance(String maskedNumber, int expectedBalance) {
+        SelenideElement card = getCardByMaskedNumber(maskedNumber);
+        card.shouldBe(visible);
+        String expectedText = balanceStart + expectedBalance + balanceFinish;
+        card.shouldHave(text(expectedText));
     }
 
     private int extractBalance(String text) {
-        String balanceStart = "баланс: ";
-        String balanceFinish = " р.";
         int start = text.indexOf(balanceStart);
         int finish = text.indexOf(balanceFinish);
         if (start == -1 || finish == -1) {
