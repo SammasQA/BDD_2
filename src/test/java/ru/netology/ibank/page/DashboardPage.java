@@ -14,10 +14,10 @@ public class DashboardPage {
     private final String balanceStart = "баланс: ";
     private final String balanceFinish = " р.";
 
-    // Конструктор
     public DashboardPage() {
         cards.first().shouldBe(visible);
     }
+
 
     private SelenideElement getCardByMaskedNumber(String maskedNumber) {
         return cards.findBy(text(maskedNumber));
@@ -31,6 +31,19 @@ public class DashboardPage {
 
     public TransferPage clickTransferButton(String receiverMaskedNumber) {
         SelenideElement card = getCardByMaskedNumber(receiverMaskedNumber);
+        card.$("[data-test-id='action-deposit']").click();
+        return new TransferPage();
+    }
+
+
+    public int getCardBalance(int index) {
+        SelenideElement card = cards.get(index);
+        String text = card.getText();
+        return extractBalance(text);
+    }
+
+    public TransferPage clickTransferButton(int index) {
+        SelenideElement card = cards.get(index);
         card.$("[data-test-id='action-deposit']").click();
         return new TransferPage();
     }

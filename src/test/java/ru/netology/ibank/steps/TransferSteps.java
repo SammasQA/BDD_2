@@ -25,51 +25,29 @@ public class TransferSteps {
         dashboardPage = verificationPage.validVerify(DataHelper.getValidVerificationCode());
     }
 
-
     @Когда("пользователь переводит {int} рублей с карты с номером {string} на карту с номером {string}")
     public void transfer(int amount, String fromCardNumber, String toCardNumber) {
-        int receiverIndex = findCardIndexByLastFourDigits(toCardNumber);
-        TransferPage transferPage = dashboardPage.clickTransferButton(receiverIndex);
+        TransferPage transferPage = dashboardPage.clickTransferButton(toCardNumber);
         dashboardPage = transferPage.transfer(amount, fromCardNumber);
     }
-
 
     @Когда("пользователь переводит {int} рублей с карты с номером {string} на свою 1 карту с главной страницы")
     public void transferToFirstCard(int amount, String fromCardNumber) {
-        TransferPage transferPage = dashboardPage.clickTransferButton(0); // индекс 0 = первая карта
+        TransferPage transferPage = dashboardPage.clickTransferButton(0); // индекс 0 — первая карта
         dashboardPage = transferPage.transfer(amount, fromCardNumber);
     }
 
-
     @Тогда("баланс карты с номером {string} должен стать {int} рублей")
     public void verifyBalance(String cardNumber, int expectedBalance) {
-        int cardIndex = findCardIndexByLastFourDigits(cardNumber);
-        int actualBalance = dashboardPage.getCardBalance(cardIndex);
+        int actualBalance = dashboardPage.getCardBalance(cardNumber);
         assertEquals(expectedBalance, actualBalance,
                 "Баланс карты " + cardNumber + " не соответствует ожидаемому");
     }
-
 
     @Тогда("баланс его 1 карты из списка на главной странице должен стать {int} рублей")
     public void verifyFirstCardBalance(int expectedBalance) {
         int actualBalance = dashboardPage.getCardBalance(0);
         assertEquals(expectedBalance, actualBalance,
                 "Баланс первой карты не соответствует ожидаемому");
-    }
-
-    private int findCardIndexByLastFourDigits(String fullCardNumber) {
-        String cleaned = fullCardNumber.replaceAll("\\s+", "");
-        String lastFour = cleaned.substring(cleaned.length() - 4);
-
-        int cardsCount = dashboardPage.getCardsCount();
-        for (int i = 0; i < cardsCount; i++) {
-            String cardText = dashboardPage.getCardText(i);
-            if (cardText.contains(lastFour)) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException(
-                "Карта с номером, оканчивающимся на " + lastFour + ", не найдена на Dashboard"
-        );
     }
 }

@@ -14,4 +14,4 @@ public class LoginPage {
         loginButton.click();
         return new VerificationPage();
     }
-}
+} 
