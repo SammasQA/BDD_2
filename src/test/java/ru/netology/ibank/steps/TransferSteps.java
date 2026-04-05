@@ -25,28 +25,17 @@ public class TransferSteps {
         dashboardPage = verificationPage.validVerify(DataHelper.getValidVerificationCode());
     }
 
-    @Когда("пользователь переводит {int} рублей с карты с номером {string} на карту с номером {string}")
-    public void transfer(int amount, String fromCardNumber, String toCardNumber) {
-        TransferPage transferPage = dashboardPage.clickTransferButton(toCardNumber);
-        dashboardPage = transferPage.transfer(amount, fromCardNumber);
-    }
-
     @Когда("пользователь переводит {int} рублей с карты с номером {string} на свою 1 карту с главной страницы")
     public void transferToFirstCard(int amount, String fromCardNumber) {
-        TransferPage transferPage = dashboardPage.clickTransferButton(0); // индекс 0 — первая карта
+        String firstCardNumber = dashboardPage.getFirstCardMaskedNumber();
+        TransferPage transferPage = dashboardPage.clickTransferButton(firstCardNumber);
         dashboardPage = transferPage.transfer(amount, fromCardNumber);
-    }
-
-    @Тогда("баланс карты с номером {string} должен стать {int} рублей")
-    public void verifyBalance(String cardNumber, int expectedBalance) {
-        int actualBalance = dashboardPage.getCardBalance(cardNumber);
-        assertEquals(expectedBalance, actualBalance,
-                "Баланс карты " + cardNumber + " не соответствует ожидаемому");
     }
 
     @Тогда("баланс его 1 карты из списка на главной странице должен стать {int} рублей")
     public void verifyFirstCardBalance(int expectedBalance) {
-        int actualBalance = dashboardPage.getCardBalance(0);
+        String firstCardNumber = dashboardPage.getFirstCardMaskedNumber();
+        int actualBalance = dashboardPage.getCardBalance(firstCardNumber);
         assertEquals(expectedBalance, actualBalance,
                 "Баланс первой карты не соответствует ожидаемому");
     }

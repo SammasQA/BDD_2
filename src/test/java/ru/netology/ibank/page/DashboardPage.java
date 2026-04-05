@@ -18,9 +18,29 @@ public class DashboardPage {
         cards.first().shouldBe(visible);
     }
 
-
     private SelenideElement getCardByMaskedNumber(String maskedNumber) {
         return cards.findBy(text(maskedNumber));
+    }
+
+    public String getFirstCardMaskedNumber() {
+        SelenideElement firstCard = cards.first();
+        String cardText = firstCard.getText();
+        return extractMaskedNumber(cardText);
+    }
+
+    private String extractMaskedNumber(String cardText) {
+        // Способ 1: берём всё до первой запятой (перед "баланс")
+        int commaIndex = cardText.indexOf(',');
+        if (commaIndex != -1) {
+            return cardText.substring(0, commaIndex).trim();
+        }
+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("([\\d*]{4} ){3}[\\d*]{4}");
+        java.util.regex.Matcher matcher = pattern.matcher(cardText);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        throw new IllegalStateException("Не удалось извлечь номер карты из текста: " + cardText);
     }
 
     public int getCardBalance(String maskedNumber) {
@@ -29,17 +49,16 @@ public class DashboardPage {
         return extractBalance(text);
     }
 
-    public TransferPage clickTransferButton(String receiverMaskedNumber) {
-        SelenideElement card = getCardByMaskedNumber(receiverMaskedNumber);
-        card.$("[data-test-id='action-deposit']").click();
-        return new TransferPage();
-    }
-
-
     public int getCardBalance(int index) {
         SelenideElement card = cards.get(index);
         String text = card.getText();
         return extractBalance(text);
+    }
+
+    public TransferPage clickTransferButton(String receiverMaskedNumber) {
+        SelenideElement card = getCardByMaskedNumber(receiverMaskedNumber);
+        card.$("[data-test-id='action-deposit']").click();
+        return new TransferPage();
     }
 
     public TransferPage clickTransferButton(int index) {
