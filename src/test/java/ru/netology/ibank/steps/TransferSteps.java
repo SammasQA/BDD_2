@@ -10,7 +10,6 @@ import ru.netology.ibank.page.TransferPage;
 import ru.netology.ibank.page.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.open;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransferSteps {
 
@@ -25,20 +24,16 @@ public class TransferSteps {
         dashboardPage = verificationPage.validVerify(DataHelper.getValidVerificationCode());
     }
 
-
     @Когда("пользователь переводит {int} рублей с карты с номером {string} на свою {int} карту с главной страницы")
     public void transferToCard(int amount, String fromCardNumber, int toCardIndex) {
-        int index = toCardIndex - 1; // пользователь видит карты с 1, а в коллекции индексы с 0
+        int index = toCardIndex - 1; // пользователь видит карты с 1, в коллекции индексы с 0
         TransferPage transferPage = dashboardPage.clickTransferButton(index);
         dashboardPage = transferPage.transfer(amount, fromCardNumber);
     }
 
-
     @Тогда("баланс его {int} карты из списка на главной странице должен стать {int} рублей")
     public void verifyCardBalance(int cardIndex, int expectedBalance) {
         int index = cardIndex - 1;
-        int actualBalance = dashboardPage.getCardBalance(index);
-        assertEquals(expectedBalance, actualBalance,
-                String.format("Баланс %d-й карты не соответствует ожидаемому", cardIndex));
+        dashboardPage.verifyCardBalance(index, expectedBalance);
     }
 }

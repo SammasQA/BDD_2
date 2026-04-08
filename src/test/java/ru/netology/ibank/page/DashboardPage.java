@@ -45,44 +45,11 @@ public class DashboardPage {
     }
 
 
-    public String getFirstCardMaskedNumber() {
-        return getCardMaskedNumber(0);
-    }
-
-
-    private SelenideElement getCardByMaskedNumber(String maskedNumber) {
-        return cards.findBy(text(maskedNumber));
-    }
-
-
-    public int getCardBalance(String maskedNumber) {
-        SelenideElement card = getCardByMaskedNumber(maskedNumber);
-        return extractBalance(card.getText());
-    }
-
-
-    public TransferPage clickTransferButton(String receiverMaskedNumber) {
-        SelenideElement card = getCardByMaskedNumber(receiverMaskedNumber);
-        card.$("[data-test-id='action-deposit']").click();
-        return new TransferPage();
-    }
-
-    public void verifyCardBalance(String maskedNumber, int expectedBalance) {
-        SelenideElement card = getCardByMaskedNumber(maskedNumber);
-        card.shouldBe(visible);
-        String expectedText = balanceStart + expectedBalance + balanceFinish;
-        card.shouldHave(text(expectedText));
-    }
-
-
-
     private String extractMaskedNumber(String cardText) {
-        // Ищем номер до запятой (перед словом "баланс")
         int commaIndex = cardText.indexOf(',');
         if (commaIndex != -1) {
             return cardText.substring(0, commaIndex).trim();
         }
-        // Регулярное выражение для формата "XXXX XXXX XXXX XXXX"
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("([\\d*]{4} ){3}[\\d*]{4}");
         java.util.regex.Matcher matcher = pattern.matcher(cardText);
         if (matcher.find()) {
